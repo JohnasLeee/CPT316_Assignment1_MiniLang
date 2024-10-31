@@ -1,7 +1,7 @@
 class Token:
     """A token in the MiniLang language."""
-    def __init__(self, name: str, line: int, column: int, value=None):
-        self.name = name
+    def __init__(self, token_type: str, line: int, column: int, value=None):
+        self.token_type = token_type
         self.value = value
         self.line = line
         self.column = column
@@ -13,7 +13,7 @@ class LexicalError(Exception):
 class Lexer:
     """Lexical analyzer for MiniLang."""
     
-    KEYWORDS = {'if', 'else', 'while', 'print'}
+    KEYWORDS = {'if', 'else', 'while', 'pout'}
     OPERATORS = {
         '+': 'PLUS',
         '-': 'MINUS',
@@ -44,7 +44,7 @@ class Lexer:
 
     def error(self, message: str):
         """Log a lexical error with position information."""
-        self.errors.append(f"Line {self.line}, Column {self.column}: {message}")
+        self.errors.append(f"Line {self.line}, Column {self.column-1}: {message}")
 
     def advance(self):
         """Read the next character from the source."""
@@ -162,51 +162,38 @@ class Lexer:
 
         return Token('EOF', self.line, self.column, None)
 
-def tokenize(source_code: str) -> tuple[list[Token], list[str]]:
+def tokenize(source_code: str, verbose=True):
     """Tokenize a string of source code and collect any lexical errors."""
     from io import StringIO
     lexer = Lexer(StringIO(source_code))
     tokens = []
+
     
     while True:
         token = lexer.next_token()
         if token:
             tokens.append(token)
-        if token and token.name == 'EOF':
+        if token and token.token_type == 'EOF':
             break
-            
-    return tokens, lexer.errors
+    
+        # Print tokens
+    if not lexer.errors:
+        if verbose:
+            print(f'Code:\n{source_code}')
+            print(f"{'Name':<10} {'Value':<10} {'Line':<6} {'Column':<6}")
+            print("-" * 32)  # Separator line
+            for token in tokens:
+                print(f"{token.name:<12} {token.value if token.value is not None else 'EOF':<10} {token.line:<6} {token.column:<6}")
 
-# Example code for testing
-code = """x = 5;
-🔥THATS FIRE BRO
-y = x * 3;
-if (y > 40) {
-    print(y);
-} 
-else {
-    print(x);
-}
-"""
+        print("\nTOKENS GENERATED SUCCESSFULLY\n")
+        return tokens
 
-tokens, errors = tokenize(code)
+    # Print all collected errors
+    else:
+        print("LEXICAL ERROR")
+        if verbose:
+            for error in lexer.errors:
+                print(error)
+        return []
 
-# Print tokens
-if not errors:
-    print("Code\n")
-    print(code)
-    print(f"{'Name':<10} {'Value':<10} {'Line':<6} {'Column':<6}")
-    print("-" * 32)  # Separator line
-    for token in tokens:
-        print(f"{token.name:<12} {token.value if token.value is not None else 'EOF':<10} {token.line:<6} {token.column:<6}")
-    print("=" * 32)
-    print("TOKENS GENERATED SUCCESSFULLY\n")
-    print("=" * 32)
 
-# Print all collected errors
-else:
-    print("=" * 32)
-    print("LEXCIAL ERROR")
-    for error in errors:
-        print(error)
-    print("=" * 32)
