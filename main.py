@@ -1,5 +1,6 @@
 import lexical
 from parser import Parser
+from semantic import SemanticAnalyzer
 
 # Example code for testing
 code = """5 = x;
@@ -47,6 +48,9 @@ try:
     # Call this function with the root AST node after parsing
     display_simple_ast(ast)
 
+    # Perform semantic analysis on the AST
+    semantic_analyzer = SemanticAnalyzer(ast)
+    semantic_analyzer.analyze()
 
 except Exception as e:
     print(str(e))
