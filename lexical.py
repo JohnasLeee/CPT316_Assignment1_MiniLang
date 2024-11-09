@@ -153,7 +153,7 @@ class Lexer:
                     return token
                 continue
 
-            if self.current_char == '🔥':
+            if self.current_char == '#':
                 self.skip_comment()
                 continue
 

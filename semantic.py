@@ -103,3 +103,29 @@ class SemanticAnalyzer:
             self.symbol_table.lookup(node.value)
         except SemanticError as e:
             self.errors.append(str(e))
+    def execute(self):
+        """Execute the AST after successful semantic analysis."""
+        if not self.errors:  # Only execute if there are no errors
+            self.visit_execute(self.ast)
+
+    def visit_execute(self, node):
+        """Recursive node visit for executing statements."""
+        method_name = f"execute_{node.node_type.lower()}"
+        executor = getattr(self, method_name, self.generic_execute)
+        return executor(node)
+
+    def generic_execute(self, node):
+        for child in node.children:
+            self.visit_execute(child)
+
+    def execute_print(self, node):
+        expr_node = node.children[0]
+        value = self.evaluate_expression(expr_node)
+        print(value)  # Call the pout function to print the value
+
+    def evaluate_expression(self, expr_node):
+        """Evaluate expressions and return their values."""
+        if expr_node.node_type == "NUMBER":
+            return expr_node.value
+        elif expr_node.node_type == "IDENTIFIER":
+            return self.symbol_table.lookup(expr_node.value)

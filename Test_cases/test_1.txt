@@ -1,0 +1,12 @@
+#Arithmatic calculation with 4 different operation
+30 + 25 = x;
+15 = y;
+x * y = z;
+if (x > y){
+    pout(x);
+}
+else{
+    pout(z);
+}
+z / 5 = final;
+pout(final);
