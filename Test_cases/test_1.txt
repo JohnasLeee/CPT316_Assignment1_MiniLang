@@ -1,6 +1,6 @@
-#Arithmatic calculation with 4 different operation
+#Control flow and Arithmatic calculation with 4 different operation
 30 + 25 = x;
-15 = y;
+15 - 3 = y;
 x * y = z;
 if (x > y){
     pout(x);

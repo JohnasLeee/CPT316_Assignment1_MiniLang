@@ -76,7 +76,7 @@ class Parser:
     def parse_expression(self):
         """Parse arithmetic expressions with operators +, -, *, /."""
         left = self.parse_term()
-        while self.current_token.token_type in ('PLUS', 'MINUS''EQUALS', 'NOT_EQUALS', 'LESS_THAN', 'GREATER_THAN', 'LESS_EQUAL', 'GREATER_EQUAL'):
+        while self.current_token.token_type in ('PLUS', 'MINUS','EQUALS', 'NOT_EQUALS', 'LESS_THAN', 'GREATER_THAN', 'LESS_EQUAL', 'GREATER_EQUAL'):
             op = self.current_token
             self.advance()
             right = self.parse_term()
