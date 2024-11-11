@@ -7,6 +7,15 @@ code = """5 = x;
 🔥Comment line 
 x * 3 + x = y;
 if (y > 40) {
+    if(x > 40){
+        pout(x);
+        if(y > 40){
+            pout(y);
+        }
+        else{
+            pout(x);
+        }
+    }
     pout(y);
 } 
 else {
