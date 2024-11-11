@@ -177,12 +177,13 @@ class Parser:
         return print_node
 
     def parse_statement_list(self):
-        """Parse a list of statements without a BLOCK node."""
-        statements = []
+        """Parse a list of statements and encapsulate in a BLOCK node."""
+        block_node = ASTNode("BLOCK")
         while self.current_token.token_type not in ('RBRACE', 'EOF'):
             stmt = self.parse_statement()
-            statements.append(stmt)
-        return statements if len(statements) > 1 else statements[0]
+            if stmt:
+                block_node.add_child(stmt)
+        return block_node
 
     def expect(self, token_type):
         """Assert the current token is of a certain type and advance."""

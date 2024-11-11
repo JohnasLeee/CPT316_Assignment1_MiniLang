@@ -1,12 +1,24 @@
-#Basic arithmatic expression
-30 = a;
-19 = b;
-40 = c;
-5 = d;
-a + c = e;
-b - d = f;
-e / f = g;
-pout(g);
-g * 3 = h;
-pout(h);
+# Control flow with nested condition
+30 + 25 = x;
+15 - 3 = y;
 
+# Calculate z as the product of x and y
+x * y = z;
+
+if (x > y) {
+    pout(x);
+    if(z >100 ){
+        pout(z);
+    }
+} else {
+    pout(z);
+}
+
+# Calculate the final value as z divided by 5
+z / 5 = final;
+while(x < 3){
+    pout(x);
+    
+}
+# Output the final result
+pout(final);
