@@ -1,65 +1,57 @@
+import os
 import lexical
 from parser import Parser
 from semantic import SemanticAnalyzer
 
-# Example code for testing
-code = """5 = x;
-🔥Comment line 
-x * 3 + x = y;
-if (y > 40) {
-    if(x > 40){
-        pout(x);
-        if(y > 40){
-            pout(y);
-        }
-        else{
-            pout(x);
-        }
-    }
-    pout(y);
-} 
-else {
-    pout(x);
-}
-"""
-
-tokens = lexical.tokenize(code, verbose=False)  # Tokenize the input code
-
-# Display tokens for debugging
-for token in tokens:
-    print(f'Token Type: {token.token_type:<13} Value: {token.value}')
-
-print('\n')
-
-# Parse the tokens to generate AST
-try:
-    parser = Parser(tokens)
-    ast = parser.parse()
-    print("\nAST Generated Successfully:")
+def process_code(code, file_name):
+    """Process MiniLang code from a string, tokenize, parse, and analyze it."""
+    print(f"\nRunning test case: {file_name}")
+    print(code)
     
-    def display_simple_ast(node, prefix=""):
-        """Display a simple ASCII representation of the AST."""
-        # Define the label with both node type and value, if the value is available
-        if node.value is not None:
-            node_label = f"{node.node_type} ({node.value})"
-        else:
-            node_label = node.node_type
+    # Tokenize the input code
+    tokens = lexical.tokenize(code, verbose=False)
+    print("Tokens:")
+    for token in tokens:
+        print(f'Token Type: {token.token_type:<13} Value: {token.value}')
+    print("\n")
 
-        # Print the current node with its prefix
-        print(prefix + node_label)
+    # Parse the tokens and generate AST
+    try:
+        parser = Parser(tokens)
+        ast = parser.parse()
+        print("AST Generated Successfully:")
 
-        # Use "   |-- " for children to indicate branching
-        if node.children:
-            for i, child in enumerate(node.children):
-                child_prefix = prefix + "   |-- "
-                display_simple_ast(child, child_prefix)
+        def display_simple_ast(node, prefix=""):
+            """Display a simple ASCII representation of the AST."""
+            if node.value is not None:
+                node_label = f"{node.node_type} ({node.value})"
+            else:
+                node_label = node.node_type
+            print(prefix + node_label)
+            if node.children:
+                for child in node.children:
+                    display_simple_ast(child, prefix + "   |-- ")
 
-    # Call this function with the root AST node after parsing
-    display_simple_ast(ast)
+        display_simple_ast(ast)
 
-    # Perform semantic analysis on the AST
-    semantic_analyzer = SemanticAnalyzer(ast)
-    semantic_analyzer.analyze()
+        # Perform semantic analysis on the AST
+        semantic_analyzer = SemanticAnalyzer(ast)
+        if semantic_analyzer.analyze():
+            semantic_analyzer.execute()
 
-except Exception as e:
-    print(str(e))
+    except Exception as e:
+        print(f"Error in {file_name}: {str(e)}")
+
+def main():
+    # Path to the test cases folder
+    test_cases_folder = os.path.join(os.path.dirname(__file__), "Test_cases")
+
+    # Iterate over each file in the test cases folder
+    for file_name in os.listdir(test_cases_folder):
+        file_path = os.path.join(test_cases_folder, file_name)
+        with open(file_path, 'r') as file:
+            code = file.read()
+            process_code(code, file_name)
+
+if __name__ == "__main__":
+    main()

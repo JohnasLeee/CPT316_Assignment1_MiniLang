@@ -1,0 +1,12 @@
+#Basic arithmatic expression
+30 = a;
+19 = b;
+40 = c;
+5 = d;
+a + c = e;
+b - d = f;
+e / f = g;
+pout(g);
+g * 3 = h;
+pout(h);
+
