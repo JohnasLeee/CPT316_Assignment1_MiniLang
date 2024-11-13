@@ -93,7 +93,7 @@ class Parser:
             op = self.current_token
             self.advance()
             right = self.parse_factor()
-            term_node = ASTNode("TERM", op.value)
+            term_node = ASTNode("EXPR", op.value)
             term_node.add_child(left)
             term_node.add_child(right)
             left = term_node  # Build term as left-associative
