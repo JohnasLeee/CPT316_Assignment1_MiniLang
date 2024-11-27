@@ -199,12 +199,12 @@ def tokenize(source_code: str):
     
         # Print tokens
     if not lexer.errors:
+        print("\nLexical Analysis: PASSED")
         print(f"{'Name':<10} {'Value':<10} {'Line':<6} {'Column':<6}")
         print("-" * 32)  # Separator line
         for token in tokens:
             print(f"{token.token_type:<12} {token.value if token.value is not None else 'EOF':<10} {token.line:<6} {token.column:<6}")
 
-        print("\nLexical Analysis: PASSED")
         return tokens
 
     # Print all collected errors

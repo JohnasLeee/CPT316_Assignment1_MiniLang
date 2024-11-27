@@ -13,8 +13,6 @@ def process_code(code, file_name):
     
     # Tokenize the input code
     tokens = lexical.tokenize(code)
-    for token in tokens:
-        print(f'Token Type: {token.token_type:<13} Value: {token.value}')
 
     # Parse the tokens and generate AST
     try:
