@@ -23,6 +23,7 @@ class SemanticAnalyzer:
         self.ast = ast
         self.symbol_table = SymbolTable()
         self.errors = []
+        self.output = []  # Add output list to store results
 
     def analyze(self):
         """Start semantic analysis on the AST."""
@@ -32,8 +33,78 @@ class SemanticAnalyzer:
             print("\nSemantic Analysis Errors:")
             for error in self.errors:
                 print(error)
+            return False
         else:
-            print("\nSemantic Analysis Passed Successfully!")
+            print("\nSemantic Analysis: PASSED")
+            return True
+
+    def execute(self):
+        """Execute the AST and print outputs."""
+        self.execute_node(self.ast)
+        if self.output:
+            print("Output:", " ".join(str(x) for x in self.output))
+
+    def execute_node(self, node):
+        """Execute a node in the AST."""
+        method_name = f"execute_{node.node_type.lower()}"
+        executor = getattr(self, method_name, self.generic_execute)
+        return executor(node)
+
+    def generic_execute(self, node):
+        """Generic execution for nodes without specific handlers."""
+        for child in node.children:
+            self.execute_node(child)
+
+    def execute_program(self, node):
+        for child in node.children:
+            self.execute_node(child)
+
+    def execute_assign(self, node):
+        identifier = node.children[0].value
+        value = self.evaluate_expr(node.children[1])
+        self.symbol_table.symbols[identifier] = value
+        return value
+
+    def execute_print(self, node):
+        value = self.evaluate_expr(node.children[0])
+        self.output.append(value)
+        return value
+
+    def execute_if(self, node):
+        condition = self.evaluate_expr(node.children[0])
+        if condition:
+            return self.execute_node(node.children[1])
+        elif len(node.children) > 2:  # Has else block
+            return self.execute_node(node.children[2])
+
+    def execute_while(self, node):
+        while self.evaluate_expr(node.children[0]):
+            self.execute_node(node.children[1])
+
+    def evaluate_expr(self, node):
+        """Evaluate an expression node."""
+        if node.node_type == "NUMBER":
+            return node.value
+        elif node.node_type == "IDENTIFIER":
+            return self.symbol_table.symbols.get(node.value, 0)
+        elif node.node_type == "EXPR":
+            left = self.evaluate_expr(node.children[0])
+            right = self.evaluate_expr(node.children[1])
+            
+            operators = {
+                '+': lambda x, y: x + y,
+                '-': lambda x, y: x - y,
+                '*': lambda x, y: x * y,
+                '/': lambda x, y: x / y if y != 0 else 0,
+                '>': lambda x, y: x > y,
+                '<': lambda x, y: x < y,
+                '>=': lambda x, y: x >= y,
+                '<=': lambda x, y: x <= y,
+                '==': lambda x, y: x == y,
+                '!=': lambda x, y: x != y
+            }
+            
+            return operators[node.value](left, right)
 
     def visit(self, node):
         """Recursive node visit for semantic checking."""

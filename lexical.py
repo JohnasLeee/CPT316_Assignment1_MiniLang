@@ -185,7 +185,7 @@ def tokenize(source_code: str, verbose=True):
             for token in tokens:
                 print(f"{token.token_type:<12} {token.value if token.value is not None else 'EOF':<10} {token.line:<6} {token.column:<6}")
 
-        print("\nTOKENS GENERATED SUCCESSFULLY\n")
+        print("\nLexical Analysis: PASSED")
         return tokens
 
     # Print all collected errors

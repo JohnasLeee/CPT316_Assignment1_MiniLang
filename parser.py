@@ -50,6 +50,9 @@ class Parser:
 
     def parse_assignment(self):
         """Parse assignment statement with right-assignment format."""
+        # Store the line number of the start of the assignment
+        start_line = self.current_token.line
+        
         # Parse the left side as an expression
         expr = self.parse_expression()
 
@@ -63,13 +66,15 @@ class Parser:
         else:
             self.syntax_error("Expected an identifier on the right side of '='")
 
-        # Expect a semicolon at the end of the assignment
-        self.expect('SEMICOLON')
-
         # Create an assignment node with identifier and expression
         assign_node = ASTNode("ASSIGN", "=")
         assign_node.add_child(identifier_node)  # Right side (target of assignment)
         assign_node.add_child(expr)             # Left side (value being assigned)
+
+        # Check for semicolon and use the line number from before the semicolon
+        if self.current_token.token_type != 'SEMICOLON':
+            self.syntax_error_at_line("Expected SEMICOLON after Statement", start_line)
+        self.advance()  # Move past the semicolon
 
         return assign_node
 
@@ -146,9 +151,6 @@ class Parser:
 
         return if_node
 
-
-
-
     def parse_while_statement(self):
         """Parse while statement."""
         while_node = ASTNode("WHILE")
@@ -190,11 +192,29 @@ class Parser:
         if self.current_token.token_type == token_type:
             self.advance()
         else:
-            self.syntax_error(f"Expected {token_type}")
+            # Map token types to more descriptive error messages
+            error_messages = {
+                'SEMICOLON': 'Expected SEMICOLON after Statement',
+                'LPAREN': 'Expected ( after Statement',
+                'RPAREN': 'Expected ) after Expression',
+                'LBRACE': 'Expected { after Condition',
+                'RBRACE': 'Expected } after Block',
+                'ASSIGN': 'Expected = in Assignment Statement'
+            }
+            # Use mapped message or default to token type if not mapped
+            message = error_messages.get(token_type, f"Expected {token_type}")
+            self.syntax_error(message)
 
     def syntax_error(self, message):
         """Handle syntax errors."""
-        line, column = self.current_token.line, self.current_token.column
-        print(f"Syntax Error at line {line}, column {column}: {message} ({self.current_token.value})")
+        print("\nSyntax Analysis: FAILED")
+        line = self.current_token.line
+        print(f"Syntax Error at line {line}: {message}")
+        raise Exception("Syntax error encountered")
+
+    def syntax_error_at_line(self, message, line):
+        """Handle syntax errors with a specific line number."""
+        print("\nSyntax Analysis: FAILED")
+        print(f"Syntax Error at line {line}: {message}")
         raise Exception("Syntax error encountered")
 

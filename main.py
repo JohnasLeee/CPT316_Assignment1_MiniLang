@@ -5,21 +5,22 @@ from semantic import SemanticAnalyzer
 
 def process_code(code, file_name):
     """Process MiniLang code from a string, tokenize, parse, and analyze it."""
-    print(f"\nRunning test case: {file_name}")
+    print(f"\n{'='*50}")
+    print(f"Running test case: {file_name}")
+    print(f"{'='*50}")
+    print("Input code: \n")
     print(code)
     
     # Tokenize the input code
     tokens = lexical.tokenize(code, verbose=False)
-    print("Tokens:")
     for token in tokens:
         print(f'Token Type: {token.token_type:<13} Value: {token.value}')
-    print("\n")
 
     # Parse the tokens and generate AST
     try:
         parser = Parser(tokens)
         ast = parser.parse()
-        print("AST Generated Successfully:")
+        print("\nSyntax Analysis: PASSED")
 
         def display_simple_ast(node, prefix=""):
             """Display a simple ASCII representation of the AST."""
@@ -34,13 +35,16 @@ def process_code(code, file_name):
 
         display_simple_ast(ast)
 
-        # Perform semantic analysis on the AST
+        # Perform semantic analysis and execute if successful
         semantic_analyzer = SemanticAnalyzer(ast)
         if semantic_analyzer.analyze():
-            semantic_analyzer.execute()
+            print("\nExecution Output:")
+            print("-" * 20)
+            semantic_analyzer.execute()  # Execute and print output
+            print("-" * 20)
 
     except Exception as e:
-        print(f"Error in {file_name}: {str(e)}")
+        print(f"\nError in {file_name}: {str(e)}")
 
 def main():
     # Path to the test cases folder
