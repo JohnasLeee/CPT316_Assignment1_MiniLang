@@ -12,7 +12,7 @@ def process_code(code, file_name):
     print(code)
     
     # Tokenize the input code
-    tokens = lexical.tokenize(code, verbose=False)
+    tokens = lexical.tokenize(code)
     for token in tokens:
         print(f'Token Type: {token.token_type:<13} Value: {token.value}')
 

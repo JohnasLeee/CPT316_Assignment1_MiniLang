@@ -74,19 +74,40 @@ class Lexer:
             self.advance()
 
     def read_number(self) -> Token:
-        """Read a numeric literal."""
+        """Read a numeric literal with range validation."""
         result = ''
         start_column = self.column - 1
         
+        # Collect all digits
         while self.current_char and self.current_char.isdigit():
             result += self.current_char
             self.advance()
         
+        # Check for invalid identifier start
         if self.current_char and (self.current_char.isalpha() or self.current_char == '_'):
             self.error("Identifiers cannot start with a number")
             return None
-
-        return Token('NUMBER', self.line, start_column, int(result))
+        
+        # Convert to integer for range validation
+        try:
+            num_value = int(result)
+            
+            # Define valid range for 32-bit signed integer
+            MIN_INT = -2_147_483_648
+            MAX_INT = 2_147_483_647
+            
+            # Check if number is within valid range
+            if num_value < MIN_INT or num_value > MAX_INT:
+                self.error(f"Integer {result} out of valid range ({MIN_INT} to {MAX_INT})")
+                return None
+            
+            return Token('NUMBER', self.line, start_column, num_value)
+        
+        except ValueError:
+            # This should not typically happen due to previous digit checking,
+            # but included for robustness
+            self.error(f"Invalid integer: {result}")
+            return None
 
     def read_identifier(self) -> Token:
         """Read an identifier or keyword."""
@@ -162,7 +183,7 @@ class Lexer:
 
         return Token('EOF', self.line, self.column, None)
 
-def tokenize(source_code: str, verbose=True):
+def tokenize(source_code: str):
     """Tokenize a string of source code and collect any lexical errors."""
     from io import StringIO
     lexer = Lexer(StringIO(source_code))
@@ -178,12 +199,10 @@ def tokenize(source_code: str, verbose=True):
     
         # Print tokens
     if not lexer.errors:
-        if verbose:
-            print(f'Code:\n{source_code}')
-            print(f"{'Name':<10} {'Value':<10} {'Line':<6} {'Column':<6}")
-            print("-" * 32)  # Separator line
-            for token in tokens:
-                print(f"{token.token_type:<12} {token.value if token.value is not None else 'EOF':<10} {token.line:<6} {token.column:<6}")
+        print(f"{'Name':<10} {'Value':<10} {'Line':<6} {'Column':<6}")
+        print("-" * 32)  # Separator line
+        for token in tokens:
+            print(f"{token.token_type:<12} {token.value if token.value is not None else 'EOF':<10} {token.line:<6} {token.column:<6}")
 
         print("\nLexical Analysis: PASSED")
         return tokens
@@ -191,9 +210,8 @@ def tokenize(source_code: str, verbose=True):
     # Print all collected errors
     else:
         print("LEXICAL ERROR")
-        if verbose:
-            for error in lexer.errors:
-                print(error)
+        for error in lexer.errors:
+            print(error)
         return []
 
 
